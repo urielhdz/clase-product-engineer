@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Tokens de marca. Tema oscuro único y monocromo; ver .claude/skills/brand-guidelines. */
+@theme {
+  --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+
+  /* Superficies, de la más profunda a la más elevada */
+  --color-canvas: #141414;
+  --color-surface: #1c1c1c;
+  --color-raised: #262626;
+  --color-line: #2e2e2e;
+
+  /* Texto */
+  --color-ink: #f2f2f2;
+  --color-ink-muted: #a3a3a3;
+  --color-ink-subtle: #6b6b6b;
+
+  /* Acción principal: blanco sobre negro */
+  --color-primary: #f2f2f2;
+  --color-primary-hover: #d4d4d4;
+  --color-on-primary: #141414;
+
+  /* Estados. Solo para comunicar estado, nunca como decoración */
+  --color-danger: #e5484d;
+  --color-success: #46a758;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+  }
+
+  h1, h2 {
+    @apply font-display;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ink;
+  }
+}

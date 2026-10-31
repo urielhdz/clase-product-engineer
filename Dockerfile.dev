@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+# Imagen para desarrollo local. La imagen de producción está en Dockerfile (Kamal).
+ARG RUBY_VERSION=4.0.9
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+WORKDIR /rails
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential curl git libjemalloc2 libpq-dev libvips libyaml-dev pkg-config postgresql-client && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+ENV BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_JOBS="4" \
+    RAILS_ENV="development"
+
+RUN gem install foreman --no-document
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+EXPOSE 3000
+CMD ["bin/dev"]

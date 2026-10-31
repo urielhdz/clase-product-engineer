@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Atajo para ejecutar todo dentro de los contenedores de desarrollo.
+#   bin/docker up             -> levanta web + db
+#   bin/docker exec <cmd>     -> ejecuta <cmd> en el contenedor web (ej. bin/rails test)
+#   bin/docker rails <args>   -> atajo para bin/rails
+#   bin/docker <otro>         -> se pasa tal cual a docker compose
+set -e
+cd "$(dirname "$0")/.."
+
+case "$1" in
+  up)    shift; exec docker compose up "$@" ;;
+  exec)  shift; exec docker compose run --rm web "$@" ;;
+  rails) shift; exec docker compose run --rm web bin/rails "$@" ;;
+  *)     exec docker compose "$@" ;;
+esac

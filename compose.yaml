@@ -1,0 +1,51 @@
+# Entorno de desarrollo: Rails y PostgreSQL en contenedores separados.
+# Uso: bin/docker up | bin/docker exec <comando>
+name: proyecto_claude
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  image: proyecto_claude-dev
+  volumes:
+    - .:/rails
+    - bundle:/usr/local/bundle
+  environment:
+    DB_HOST: db
+    DB_USERNAME: postgres
+    DB_PASSWORD: postgres
+    BINDING: 0.0.0.0
+    # OAuth App de GitHub para desarrollo (callback: http://localhost:3000/auth/github/callback)
+    GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+    GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  web:
+    <<: *app
+    command: bash -c "rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/dev"
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    tty: true
+    stdin_open: true
+
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:${DB_HOST_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  bundle:
+  postgres_data:
